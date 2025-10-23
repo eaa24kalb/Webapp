@@ -1,6 +1,6 @@
 {
   "name": "webapp",
-   "homepage": "https://eaa24kalb.github.io/webapp",
+  "homepage": "https://eaa24kalb.github.io/webapp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.4",
+    "suncalc": "^1.9.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

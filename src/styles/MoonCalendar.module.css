@@ -1,0 +1,41 @@
+.gridWrap {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+.dayCard {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 8px;
+  border-radius: 10px;
+  min-height: 64px;
+  text-align: center;
+  font-size: 13px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:6px;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.dayCard:active,
+.dayCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.28);
+}
+.active {
+  border-color: var(--accent);
+  box-shadow: 0 6px 16px rgba(246,211,101,0.08);
+  transform: translateY(-4px);
+}
+.date {
+  font-weight:700;
+  font-size:16px;
+}
+.phaseSmall { font-size: 11px; color: var(--muted) }
+.signSmall { font-size: 11px; color: var(--muted) }
+.center { text-align: center; padding: 20px; color: var(--muted) }
+
+@media (max-width: 420px) {
+  .gridWrap { grid-template-columns: repeat(4, 1fr); }
+}
