@@ -33,7 +33,7 @@ export default function BottomNav() {
         }
       >
         <div>🧭</div>
-        <div className="small">Chart</div>
+        <div className="small">Birthchart</div>
       </NavLink>
 
       <NavLink

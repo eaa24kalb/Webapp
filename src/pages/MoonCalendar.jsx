@@ -1,86 +1,43 @@
 // src/pages/MoonCalendar.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { fetchMoonCalendar } from "../services/api";
-import Card from "../components/Card";
 import styles from "../styles/MoonCalendar.module.css";
 
-// helper: chunk array into weeks starting from a given weekday (0=Sun, 1=Mon)
 function chunkDaysToWeeks(days = [], weekStart = 1) {
-  if (!days || days.length === 0) return [];
-  // build map date->day object keyed by ISO
+  if (!days?.length) return [];
   const first = new Date(days[0].date);
   const last = new Date(days[days.length - 1].date);
-
-  // find first day to show: back up until weekStart
   const start = new Date(first);
   while (start.getDay() !== weekStart) start.setDate(start.getDate() - 1);
-
-  // build continuous list from start to last (inclusive)
   const cursor = new Date(start);
   const all = [];
   const end = new Date(last);
-  // pad until we pass end by at least one week
   while (cursor <= end || all.length % 7 !== 0) {
     const iso = cursor.toISOString().slice(0, 10);
     const match = days.find(d => d.date === iso);
     all.push(match || { date: iso, placeholder: true });
     cursor.setDate(cursor.getDate() + 1);
   }
-
-  // chunk into arrays of 7
   const weeks = [];
-  for (let i = 0; i < all.length; i += 7) {
-    weeks.push(all.slice(i, i + 7));
-  }
+  for (let i = 0; i < all.length; i += 7) weeks.push(all.slice(i, i + 7));
   return weeks;
 }
 
-// simple swipe detection (mouse + touch)
 function useSwipe(onLeft = () => {}, onRight = () => {}) {
-  const startX = useRef(null);
-  const startY = useRef(null);
-  const isDragging = useRef(false);
-
-  function handleStart(clientX, clientY) {
-    startX.current = clientX;
-    startY.current = clientY;
-    isDragging.current = true;
-  }
-  function handleMove(clientX, clientY) {
-    if (!isDragging.current || startX.current === null) return;
-    const dx = clientX - startX.current;
-    const dy = clientY - startY.current;
-    // ignore mostly vertical moves
-    if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
-      // we will detect on end
-    }
-  }
-  function handleEnd(clientX) {
-    if (!isDragging.current || startX.current === null) return;
-    const dx = clientX - startX.current;
-    if (dx < -60) onLeft();
-    else if (dx > 60) onRight();
-    startX.current = null;
-    startY.current = null;
-    isDragging.current = false;
-  }
-
+  const startX = useRef(null), startY = useRef(null), dragging = useRef(false);
+  const start = (x, y) => { startX.current = x; startY.current = y; dragging.current = true; };
+  const end = (x) => {
+    if (!dragging.current || startX.current == null) return;
+    const dx = x - startX.current;
+    if (dx < -60) onLeft(); else if (dx > 60) onRight();
+    startX.current = null; startY.current = null; dragging.current = false;
+  };
   return {
-    onTouchStart: e => {
-      const t = e.touches[0];
-      handleStart(t.clientX, t.clientY);
-    },
-    onTouchEnd: e => {
-      // touches empty on end; use changedTouches
-      const t = e.changedTouches[0];
-      handleEnd(t.clientX);
-    },
-    onMouseDown: e => handleStart(e.clientX, e.clientY),
-    onMouseUp: e => handleEnd(e.clientX),
-    onMouseLeave: e => {
-      // cancel drag
-      startX.current = null; isDragging.current = false;
-    }
+    onTouchStart: e => start(e.touches[0].clientX, e.touches[0].clientY),
+    onTouchEnd: e => end(e.changedTouches[0].clientX),
+    onMouseDown: e => start(e.clientX, e.clientY),
+    onMouseUp: e => end(e.clientX),
+    onMouseLeave: () => { startX.current = null; dragging.current = false; }
   };
 }
 
@@ -90,189 +47,150 @@ export default function MoonCalendar() {
   const [weekIndex, setWeekIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
-  const containerRef = useRef(null);
 
-  // fetch month once (default current)
   useEffect(() => {
     let mounted = true;
     (async () => {
       setLoading(true);
       try {
-        const res = await fetchMoonCalendar(); // uses defaults
+        const res = await fetchMoonCalendar();
         if (!mounted) return;
         setData(res);
-        const w = chunkDaysToWeeks(res.days || [], 1); // monday-start
+        const w = chunkDaysToWeeks(res.days || [], 1);
         setWeeks(w);
-        // pick week that contains today's date
+
         const todayIso = new Date().toISOString().slice(0, 10);
         let idx = w.findIndex(week => week.some(d => d && d.date === todayIso));
         if (idx === -1) idx = 0;
         setWeekIndex(idx);
-        setSelected((w[idx] || [])[0] || null);
-      } catch (err) {
-        console.error(err);
-        if (mounted) setData(null);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => (mounted = false);
-  }, []);
 
-  // update selected when week changes
-  useEffect(() => {
-    if (!weeks || weeks.length === 0) return;
-    const wk = weeks[weekIndex] || weeks[0];
-    // default select the middle day or first if none
-    const pick = wk.find(d => !!d && !d.placeholder) || wk[Math.floor(wk.length / 2)];
-    setSelected(pick);
-  }, [weekIndex, weeks]);
+        const wk = w[idx] || [];
+        const firstReal = wk.find(d => d && !d.placeholder) || wk[0] || null;
+        setSelected(firstReal);
+      } finally { mounted && setLoading(false); }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const gotoPrev = () => setWeekIndex(i => Math.max(0, i - 1));
   const gotoNext = () => setWeekIndex(i => Math.min(weeks.length - 1, i + 1));
-
   const swipe = useSwipe(gotoNext, gotoPrev);
+  const time = iso => iso ? new Date(iso).toLocaleTimeString([], { timeStyle: "short" }) : "—";
 
-  // ensure detail area fits the frame — we'll constrain heights via CSS
+  const wk = weeks[weekIndex] || [];
+  const chips = (() => {
+    const arr = wk.slice(0, 7); // all 7
+    while (arr.length < 7) arr.push(null);
+    return arr;
+  })();
+
   return (
-    <div className={styles.calendarFrame}>
-      <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <h3 style={{ margin: 0 }}>Moon Calendar</h3>
-            <div className="small">{data ? `${data.month}/${data.year}` : ""}</div>
-          </div>
-
-          <div style={{ display: "flex", gap: 8 }}>
-            <button className="button" onClick={gotoPrev} aria-label="Previous week">←</button>
-            <button className="button" onClick={gotoNext} aria-label="Next week">→</button>
-          </div>
+    <div className={styles.page}>
+      <section className={styles.hero}>
+        <div className={styles.topRow}>
+          <button className={styles.backBtn} onClick={() => history.back()} aria-label="Back">←</button>
+          <div className={styles.topTitle}>Moon Calendar</div>
+          <div className={styles.monthBadge}>{data ? `${data.month}/${data.year}` : ""}</div>
         </div>
 
+        {/* 7 fixed chips */}
         <div
-          ref={containerRef}
-          className={styles.weekScroller}
-          // attach swipe handlers
+          className={styles.weekRow7}
           onTouchStart={swipe.onTouchStart}
           onTouchEnd={swipe.onTouchEnd}
           onMouseDown={swipe.onMouseDown}
           onMouseUp={swipe.onMouseUp}
           onMouseLeave={swipe.onMouseLeave}
         >
-          {/* Week row (only one week visible) */}
-          <div className={styles.weekRow}>
-            {(weeks[weekIndex] || Array.from({ length: 7 })).map((d, idx) => {
-              const isEmpty = !d || d.placeholder;
-              const isActive = selected && d && d.date === selected.date;
-              return (
-                <button
-                  key={d ? d.date : `empty-${idx}`}
-                  className={`${styles.dayCard} ${isActive ? styles.active : ""}`}
-                  onClick={() => !isEmpty && setSelected(d)}
-                  disabled={isEmpty}
-                  aria-pressed={isActive}
-                >
-                  <div className={styles.date}>{new Date(d ? d.date : null).getDate() || ""}</div>
-                  <div className={styles.phaseSmall}>{d && d.phase ? d.phase.split(" ")[0] : ""}</div>
-                  <div className={styles.signSmall}>{d && d.sign ? d.sign : ""}</div>
-                </button>
-              );
-            })}
+          {chips.map((d, idx) => {
+            const isEmpty = !d || d.placeholder;
+            const isActive = selected && d && d.date === selected.date;
+            const dt = d ? new Date(d.date) : null;
+            const w = dt ? dt.toLocaleDateString(undefined, { weekday: "short" }).toUpperCase() : "";
+            const m = dt ? dt.toLocaleDateString(undefined, { month: "short" }) : "";
+            const day = dt ? dt.getDate() : "";
+            return (
+              <button
+                key={d ? d.date : `empty-${idx}`}
+                className={`${styles.chip} ${isActive ? styles.chipActive : ""}`}
+                onClick={() => !isEmpty && setSelected(d)}
+                disabled={isEmpty}
+                aria-pressed={isActive}
+              >
+                <div className={styles.chipTop}>{w}</div>
+                <div className={styles.chipBottom}>{m} {day}</div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* arrows UNDER the chips */}
+        <div className={styles.weekArrowsUnder}>
+          <button className={styles.arrowBtn} onClick={gotoPrev} aria-label="Previous week">←</button>
+          <button className={styles.arrowBtn} onClick={gotoNext} aria-label="Next week">→</button>
+        </div>
+
+        {/* phase + % */}
+        <h1 className={styles.phaseTitle}>{selected?.phase || "—"}</h1>
+        <div className={styles.phaseSub}>
+          {selected?.illumination != null ? `${selected.illumination}% illuminated` : "—"}
+        </div>
+
+        {/* moon image */}
+        <div className={styles.moonWrap}><div className={styles.moonImg} aria-hidden /></div>
+
+        {/* times */}
+        <div className={styles.timesRow}>
+          <div className={styles.timeCol}><span className={styles.timeIcon}>🌙⬆️</span><div className={styles.timeText}>{time(selected?.rise)}</div></div>
+          <div className={styles.timeCol}><span className={styles.timeIcon}>🌙⬇️</span><div className={styles.timeText}>{time(selected?.set)}</div></div>
+          <div className={styles.timeCol}><span className={styles.timeIcon}>☀️⬆️</span><div className={styles.timeText}>{time(selected?.sunrise)}</div></div>
+          <div className={styles.timeCol}><span className={styles.timeIcon}>☀️⬇️</span><div className={styles.timeText}>{time(selected?.sunset)}</div></div>
+        </div>
+
+        <div className={styles.dots}><span className={styles.dot} /><span className={`${styles.dot} ${styles.dotActive}`} /></div>
+
+        {/* info */}
+        <div className={styles.infoGrid}>
+          <div className={styles.infoRow}><span>Moon Distance:</span><strong>{selected?.distanceKm ? `${selected.distanceKm.toLocaleString()} km` : "—"}</strong></div>
+          <div className={styles.infoRow}><span>Moon Age:</span><strong>{selected?.age != null ? `${selected.age} days` : "—"}</strong></div>
+          <div className={styles.infoRow}><span>Moon Zodiac:</span><strong>{selected?.sign || "—"}</strong></div>
+          <div className={styles.infoRow}><span>Altitude:</span><strong>{selected?.altitude != null ? `${selected.altitude}°` : "—"}</strong></div>
+          <div className={styles.infoRow}><span>Azimuth:</span><strong>{selected?.azimuth != null ? `${selected.azimuth}°` : "—"}</strong></div>
+        </div>
+
+        {/* rituals – unchanged */}
+        <div className={styles.ritualsWrap}>
+          <div className={styles.ritualsTitle}>Rituals</div>
+          <div className={styles.ritualGrid}>
+            {(() => {
+              const key = (selected?.phaseId || "unknown").toLowerCase().replace(/\s+/g, "_");
+              const map = {
+                new_moon: ["New Moon — Set intentions", "Moon water — charge jar overnight"],
+                waxing_crescent: ["Plant seeds — small steps", "Carry citrine"],
+                first_quarter: ["Take decisive action", "Short movement ritual"],
+                waxing_gibbous: ["Polish projects"],
+                full: ["Full moon release", "Full moon bath (moon water)"],
+                waning_gibbous: ["Share & reflect"],
+                last_quarter: ["Let go & declutter"],
+                waning_crescent: ["Rest & prepare"],
+                unknown: ["Quiet night — journal"]
+              };
+              return (map[key] || map.unknown).map((t, i) => (
+                <div key={i} className={styles.ritualCard}>
+                  <div className={styles.ritualTitle}>{t}</div>
+                  <div className={styles.ritualDesc}>
+                    {t.includes("moon water")
+                      ? "Fill a jar of clean water and place it where it will receive moonlight overnight."
+                      : "A short practical action to align with the lunar energy."}
+                  </div>
+                </div>
+              ));
+            })()}
           </div>
         </div>
 
-      </Card>
-
-      {/* Detail area — constrained and scrollable */}
-      <div className={styles.detailArea}>
-        <Card>
-          {selected ? (
-            <div className={styles.detailGrid}>
-              <div className={styles.detailHero}>
-                <h2 style={{ margin: "4px 0 6px", fontSize: 26 }}>{selected.phase}</h2>
-                <div className="small" style={{ opacity: 0.9 }}>{selected.illumination}% illuminated</div>
-
-                <div style={{ marginTop: 12 }} className={styles.moonImg} aria-hidden />
-              </div>
-
-              <div style={{ minWidth: 0 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }}>
-                  <div>
-                    <div className="small">Rise</div>
-                    <div style={{ fontWeight: 700 }}>{selected.rise ? new Date(selected.rise).toLocaleTimeString([], { timeStyle: "short" }) : "—"}</div>
-                  </div>
-
-                  <div>
-                    <div className="small">Set</div>
-                    <div style={{ fontWeight: 700 }}>{selected.set ? new Date(selected.set).toLocaleTimeString([], { timeStyle: "short" }) : "—"}</div>
-                  </div>
-
-                  <div>
-                    <div className="small">Distance</div>
-                    <div style={{ fontWeight: 700 }}>{selected.distanceKm ? `${selected.distanceKm.toLocaleString()} km` : "—"}</div>
-                  </div>
-
-                  <div>
-                    <div className="small">Age</div>
-                    <div style={{ fontWeight: 700 }}>{selected.age !== null ? `${selected.age} d` : "—"}</div>
-                  </div>
-
-                  <div>
-                    <div className="small">Altitude</div>
-                    <div style={{ fontWeight: 700 }}>{selected.altitude !== null ? `${selected.altitude}°` : "—"}</div>
-                  </div>
-
-                  <div>
-                    <div className="small">Azimuth</div>
-                    <div style={{ fontWeight: 700 }}>{selected.azimuth !== null ? `${selected.azimuth}°` : "—"}</div>
-                  </div>
-                </div>
-
-                <div style={{ marginTop: 12 }}>
-                  <div className="small">Recommendation</div>
-                  <div style={{ marginTop: 6 }}>{selected.recommendation}</div>
-                </div>
-
-                <div style={{ marginTop: 12 }}>
-                  <div className="small" style={{ marginBottom: 8, fontWeight: 700 }}>Rituals</div>
-                  {/* show a compact list of rituals */}
-                  <div style={{ display: "grid", gap: 8 }}>
-                    {(selected.phaseId ? ( // normalize
-                      (() => {
-                        const key = selected.phaseId.toLowerCase().replace(/\s+/g, "_");
-                        // small mapping inline for simplicity
-                        const map = {
-                          new_moon: ["New Moon — Set intentions", "Moon water — charge jar overnight"],
-                          waxing_crescent: ["Plant seeds — small steps", "Carry citrine"],
-                          first_quarter: ["Take decisive action", "Short movement ritual"],
-                          waxing_gibbous: ["Polish projects"],
-                          full: ["Full moon release", "Full moon bath (moon water)"],
-                          waning_gibbous: ["Share & reflect"],
-                          last_quarter: ["Let go & declutter"],
-                          waning_crescent: ["Rest & prepare"]
-                        };
-                        return (map[key] || ["Quiet night — journal"]).map((t, i) => (
-                          <div key={i} className={styles.ritualCard}>
-                            <div style={{ fontWeight: 700 }}>{t}</div>
-                            <div className="small" style={{ marginTop: 6 }}>
-                              {t.includes("moon water") ? "Fill a jar of clean water and place where it will receive moonlight overnight." : "A short practical action to align with the lunar energy."}
-                            </div>
-                            <div style={{ marginTop: 8 }}>
-                              <button className="button" onClick={() => alert("Saved ritual (demo)")}>Save</button>
-                            </div>
-                          </div>
-                        ));
-                      })()
-                    ) : null)}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className={styles.center}>Select a day to see details</div>
-          )}
-        </Card>
-      </div>
+        {loading && <div className={styles.center}>Loading…</div>}
+      </section>
     </div>
   );
 }

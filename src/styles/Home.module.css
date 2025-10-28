@@ -1,0 +1,221 @@
+/* --------- Page layout --------- */
+.page {
+  display: grid;
+  gap: 28px; /* more vertical breathing room */
+  padding-bottom: 40px;
+}
+
+/* --------- Glance card --------- */
+.glanceCard {
+  background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
+  border: 1.2px solid #C7A35B;
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+
+.sectionTitle {
+  margin: 0 0 14px 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 0.3px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.glanceQuote {
+  margin: 10px 0 24px 0;
+  font-size: 20px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text);
+  font-family: var(--font-display);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+
+.doDont {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px; /* more spacing between columns */
+  margin-bottom: 24px;
+}
+
+.doDontTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color:  var(--muted);
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.glanceFooter {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.zodiacRow {
+  display: flex;
+  gap: 10px;
+  opacity: 0.8;
+  font-size: 20px;
+  color: var(--gold);
+}
+
+.readMoreBtn {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: 1px solid #C7A35B;
+  background: rgba(199, 163, 91, 0.1);
+  backdrop-filter: blur(8px);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all .2s ease;
+}
+.readMoreBtn:hover,
+.readMoreBtn:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(199, 163, 91, 0.25);
+  background: rgba(199, 163, 91, 0.25);
+}
+
+/* --------- Community section --------- */
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 10px;
+}
+
+.arrowBtn {
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 6px 12px;
+  color: var(--text);
+  transition: all 0.2s ease;
+}
+.arrowBtn:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.1);
+}
+
+.feed {
+  display: grid;
+  gap: 16px; /* more spacing between cards */
+}
+
+.feedCard {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1.2px solid #C7A35B;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+
+.feedHeader {
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.2) 40%, rgba(0,0,0,0.25) 65%),
+    linear-gradient(135deg, rgba(246,211,101,0.25), rgba(153,84,187,0.25));
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  flex-shrink: 0;
+}
+
+.identity {
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.sign {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.handle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.chevronBtn {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid #C7A35B;
+  background: rgba(199,163,91,0.2);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+.chevronBtn:hover {
+  background: rgba(199,163,91,0.35);
+  transform: translateY(-2px);
+}
+
+.snippet {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* --------- Small screens --------- */
+@media (max-width: 420px) {
+  .page {
+    gap: 20px;
+  }
+
+  .glanceCard {
+    padding: 18px 16px;
+  }
+
+  .glanceQuote {
+    font-size: 17px;
+  }
+
+  .feedCard {
+    padding: 16px;
+  }
+}

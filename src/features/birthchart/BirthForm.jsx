@@ -1,54 +1,65 @@
-import React, { useState } from "react";
-import useBirthCalc from "./useBirthCalc";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { calculateBirthChart } from "../../services/birthchart";
+import { loadSavedForm, saveForm, saveResult } from "./useLocalChart";
 
 export default function BirthForm() {
-  const [name, setName] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [place, setPlace] = useState("");
-  const { run, loading, error } = useBirthCalc();
-  const navigate = useNavigate();
+  const nav = useNavigate();
+  const [form, setForm] = useState({ name: "Luna", date: "", time: "", city: "Copenhagen" });
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
 
-  async function handleSubmit(e) {
+  useEffect(() => {
+    const saved = loadSavedForm();
+    if (saved) setForm(prev => ({ ...prev, ...saved }));
+  }, []);
+
+  function update(e) {
+    const next = { ...form, [e.target.name]: e.target.value };
+    setForm(next);
+    saveForm(next);
+  }
+
+  async function onSubmit(e) {
     e.preventDefault();
-    if (!date) return alert("Please enter a birth date");
+    setErr("");
+    if (!form.date || !form.time || !form.city) {
+      setErr("Please fill date, time and city.");
+      return;
+    }
     try {
-      const result = await run({ name, date, time, place });
-      // navigate to result page with state
-      navigate("/chart/result", { state: { result } });
-    } catch (err) {
-      console.error(err);
-      alert("Calculation failed");
+      setLoading(true);
+      const result = await calculateBirthChart(form);
+      saveForm(form);
+      saveResult(result);
+      nav("/chart/result", { state: { result } });
+    } catch (ex) {
+      console.error(ex);
+      setErr("We couldn’t calculate your chart. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <label>
-        <div className="small">Name (optional)</div>
-        <input value={name} onChange={e => setName(e.target.value)} placeholder="Luna" style={{ width: "100%", padding: 8, borderRadius:8 }} />
-      </label>
+    <form onSubmit={onSubmit} className="formStack">
+      <label className="fieldLabel">Name (optional)</label>
+      <input name="name" value={form.name} onChange={update} placeholder="Luna" />
 
-      <label>
-        <div className="small">Date of birth</div>
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} required style={{ width: "100%", padding:8, borderRadius:8 }} />
-      </label>
+      <label className="fieldLabel">Date of birth</label>
+      <input name="date" value={form.date} onChange={update} placeholder="dd.mm.yyyy" />
 
-      <label>
-        <div className="small">Time of birth</div>
-        <input type="time" value={time} onChange={e => setTime(e.target.value)} style={{ width: "100%", padding:8, borderRadius:8 }} />
-      </label>
+      <label className="fieldLabel">Time of birth</label>
+      <input name="time" value={form.time} onChange={update} placeholder="hh:mm" />
 
-      <label>
-        <div className="small">Place of birth (city)</div>
-        <input value={place} onChange={e => setPlace(e.target.value)} placeholder="Copenhagen" style={{ width: "100%", padding:8, borderRadius:8 }} />
-      </label>
+      <label className="fieldLabel">Place of birth (city)</label>
+      <input name="city" value={form.city} onChange={update} placeholder="City" />
 
-      <div>
-        <button type="submit" className="button" disabled={loading}>{loading ? "Calculating…" : "Calculate birth chart"}</button>
-        {error && <div className="small" style={{ color: "salmon" }}>{error}</div>}
-      </div>
+      {err ? <div className="formError">{err}</div> : null}
+
+      <button className="button" type="submit" disabled={loading}>
+        {loading ? "Calculating…" : "Calculate birth chart"}
+      </button>
     </form>
   );
 }

@@ -1,128 +1,111 @@
-/* ---------- MoonCalendar.module.css ---------- */
+/* page container */
+.page {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0 12px 18px;
+}
 
-.gridWrap {
+/* free-flow hero */
+.hero {
+  border-radius: 18px;
+  padding: 16px 16px 18px;
+  background: linear-gradient(180deg, rgba(58,44,66,0.9) 0%, rgba(78,46,82,0.9) 100%);
+  position: relative;
+}
+
+/* top row */
+.topRow { display:flex; align-items:center; justify-content:space-between; }
+.backBtn {
+  border-radius: 999px; width: 36px; height: 28px;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: var(--text);
+}
+.topTitle { font-weight: 700; letter-spacing: .2px; }
+.monthBadge { font-size: 12px; color: var(--muted); }
+
+/* 7-day row: fixed-size chips */
+.weekRow7 {
+  margin-top: 14px;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 10px;
-  margin-top: 12px;
 }
 
-.dayCard {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.04);
-  padding: 10px;
-  border-radius: 12px;
-  min-height: 74px;
+.chip {
+  border-radius: 14px;
+  height: 64px;             /* fixed height */
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: var(--text);
   text-align: center;
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  transition: transform .18s cubic-bezier(.2,.9,.2,1), box-shadow .18s cubic-bezier(.2,.9,.2,1);
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  gap: 4px;
 }
+.chip:disabled { opacity: .45; }
+.chipActive { border-color: var(--accent); box-shadow: 0 10px 22px rgba(246,211,101,0.10); }
+.chipTop { font-size: 11px; font-weight: 800; letter-spacing: .6px; }
+.chipBottom { font-size: 11px; color: var(--muted); }
 
-/* Hover/active effect for day cards */
-.dayCard:active,
-.dayCard:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.38);
+/* arrows UNDER chips */
+.weekArrowsUnder {
+  margin-top: 8px;
+  display:flex; justify-content:center; gap: 10px;
 }
-
-.active {
-  border-color: var(--accent);
-  box-shadow: 0 18px 36px rgba(246,211,101,0.08);
-  transform: translateY(-8px);
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(246,211,101,0.03));
-}
-
-.date {
-  font-weight: 700;
-  font-size: 16px;
+.arrowBtn {
+  border-radius: 12px; width: 44px; height: 30px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
   color: var(--text);
 }
 
-.phaseSmall { font-size: 12px; color: var(--muted); text-transform: capitalize; }
-.signSmall { font-size: 12px; color: var(--muted); }
-.center { text-align: center; padding: 20px; color: var(--muted); }
+/* title + % */
+.phaseTitle { margin: 18px 0 4px; text-align:center; font-size:28px; font-weight:800; }
+.phaseSub { text-align:center; color: var(--muted); }
 
-/* ---------- Responsive ---------- */
-@media (max-width: 420px) {
-  .gridWrap { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+/* big moon */
+.moonWrap { display:flex; justify-content:center; margin-top: 14px; }
+.moonImg {
+  width: 240px; height: 240px; border-radius: 999px;
+  background:
+    url("/src/assets/moon.png") center/cover no-repeat,
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.05) 28%, rgba(0,0,0,0.65) 60%);
+  box-shadow: inset -16px -12px 32px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.35);
 }
 
-/* ---------- Detail Card ---------- */
-.detailGrid,
-.detail-grid { /* merged old & new naming */
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  align-items: start;
-}
+/* times row */
+.timesRow { margin-top: 12px; display:flex; justify-content:space-around; align-items:center; }
+.timeCol { display:flex; flex-direction:column; align-items:center; gap: 4px; }
+.timeIcon { font-size: 18px; }
+.timeText { font-size: 13px; }
 
-.detailHero,
-.detail-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-}
+/* dots */
+.dots { display:flex; justify-content:center; gap:8px; margin-top: 8px; }
+.dot { width:6px; height:6px; border-radius:999px; background: rgba(255,255,255,0.25); }
+.dotActive { background: var(--accent); }
 
-.moonImg,
-.detail-hero .moon-img {
-  width: 160px;
-  height: 160px;
-  border-radius: 999px;
-  margin-top: 12px;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.05) 28%, rgba(0,0,0,0.65) 60%);
-  box-shadow: inset -12px -8px 28px rgba(0,0,0,0.6), 0 6px 20px rgba(0,0,0,0.35);
-}
+/* info */
+.infoGrid { margin-top: 14px; display:grid; grid-template-columns: 1fr 1fr; column-gap:24px; row-gap:10px; }
+.infoRow { display:flex; justify-content:space-between; font-size: 14px; }
 
-/* ---------- Ritual Card ---------- */
-.ritualCard,
-.ritual-card {
+/* rituals */
+.ritualsWrap { margin-top: 14px; }
+.ritualsTitle { font-size:13px; font-weight:700; margin-bottom:8px; }
+.ritualGrid { display:grid; gap:8px; }
+.ritualCard {
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-radius: 10px;
-  padding: 10px;
-  border: 1px solid rgba(255,255,255,0.03);
+  border-radius: 10px; padding: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
 }
+.ritualTitle { font-weight: 700; }
+.ritualDesc { font-size: 13px; color: var(--muted); margin-top: 6px; }
 
-/* ---------- New additions ---------- */
+/* misc */
+.center { text-align:center; padding:20px; color: var(--muted); }
 
-/* Frame: constrain calendar to viewport */
-.calendarFrame {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: calc(100vh - 120px);
-  overflow: hidden;
-}
-
-/* Week scroller area */
-.weekScroller {
-  width: 100%;
-  overflow: hidden;
-}
-
-/* Row containing 7 day cards */
-.weekRow {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-}
-
-
-
-.detailArea {
-  flex: 1 1 auto;
-  overflow: auto;
-}
-
-.center { text-align:center; padding:20px; color:var(--muted); }
-
-/* ---------- Responsive tweaks ---------- */
+/* responsive */
 @media (max-width: 420px) {
-  .weekRow { grid-template-columns: repeat(7, 1fr); }
-  .detailGrid { grid-template-columns: 1fr; }
-  .moonImg { width: 140px; height: 140px; }
+  .moonImg { width: 210px; height: 210px; }
 }

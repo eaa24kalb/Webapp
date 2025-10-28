@@ -1,4 +1,6 @@
+// src/components/AppShell.jsx
 import React from "react";
+import { useLocation } from "react-router-dom";
 import BottomNav from "./BottomNav";
 import Avatar1 from "../assets/images/Avatar1.png";
 import "../App.css";
@@ -22,22 +24,34 @@ export default function AppShell({ children }) {
   const now = new Date();
   const greeting = getGreeting(now);
   const longDate = formatLongDate(now);
+  const location = useLocation();
+
+  // ✅ Only show header on the Home route
+  const isHome = location.pathname === "/";
+  const showHeader = isHome;
+
+  // ✅ Make every non-home page full-bleed
+  const isFullBleed = !isHome;
 
   return (
     <div className="appContainer">
-      <header className="header">
-        <div className="headerText">
-          <div className="greeting">{greeting}</div>
-          <div className="userName">Luna</div>
-          <div className="date">{longDate}</div>
-        </div>
+      {showHeader && (
+        <header className="header">
+          <div className="headerText">
+            <div className="greeting">{greeting}</div>
+            <div className="userName">Luna</div>
+            <div className="date">{longDate}</div>
+          </div>
 
-        <div className="avatarWrapper">
-          <img src={Avatar1} alt="Luna" className="avatarImg" />
-        </div>
-      </header>
+          <div className="avatarWrapper">
+            <img src={Avatar1} alt="Luna" className="avatarImg" />
+          </div>
+        </header>
+      )}
 
-      <main className="content">{children}</main>
+      <main className={`content ${isFullBleed ? "contentFull" : ""}`}>
+        {children}
+      </main>
 
       <BottomNav />
     </div>

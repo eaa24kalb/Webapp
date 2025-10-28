@@ -1,0 +1,71 @@
+.wrap {
+  display: grid;
+  place-items: center;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ringOuter {
+  fill: none;
+  stroke: rgba(255,255,255,0.15);
+  stroke-width: 10;
+}
+
+.ringSigns {
+  fill: none;
+  stroke: rgba(255,255,255,0.12);
+  stroke-width: 2;
+}
+
+.ringInner {
+  fill: none;
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 1.5;
+}
+
+.signLine {
+  stroke: rgba(255,255,255,0.16);
+  stroke-width: 1.2;
+}
+
+.signLabel {
+  font-size: 12px;
+  font-family: var(--font-display);
+  fill: var(--text);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.houseLine {
+  stroke: rgba(255,255,255,0.18);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.houseNum {
+  font-size: 10px;
+  fill: var(--muted);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.planetDot {
+  fill: #C7A35B; /* your gold */
+  stroke: rgba(0,0,0,0.4);
+  stroke-width: 0.5;
+}
+
+.planetLabel {
+  font-size: 12px;
+  fill: var(--text);
+}
+
+.ascLabel {
+  font-size: 12px;
+  fill: var(--gold);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}

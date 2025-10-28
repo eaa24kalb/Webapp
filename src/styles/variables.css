@@ -6,3 +6,18 @@
   --glass-border: #C7A35B;
   --text: #efe7f2;
 }
+
+:root {
+  --gold: #f6d365;
+  --gold-20: rgba(246, 211, 101, 0.20);
+  --gold-35: rgba(246, 211, 101, 0.35);
+  --purple-700: #2e1c3a;
+  --purple-800: #1d1422;
+
+  /* --- Typography --- */
+  --font-body: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "Noto Serif", Georgia, "Times New Roman", serif;
+
+  /* Optionally: replace serif-display if you used that name before */
+  --serif-display: var(--font-display);
+}

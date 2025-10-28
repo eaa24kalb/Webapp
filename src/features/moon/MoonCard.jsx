@@ -26,7 +26,7 @@ export default function MoonCard({ date = new Date(), lat = 55.68, lon = 12.57 }
         {/* existing content unchanged */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
-            <h3 id="moon-title" style={{ margin: 0 }}>Moon</h3>
+            <h3 id="moon-title" style={{ margin: 0 }}>Current Moon Phase</h3>
             <div className="small">{phaseName} · {illuminationPercent}% lit</div>
           </div>
 

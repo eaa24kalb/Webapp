@@ -1,13 +1,18 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import Card from "../components/Card";
+import ChartWheel from "../features/birthchart/ChartWheel";
+import { loadSavedResult, clearSavedChart } from "../features/birthchart/useLocalChart";
 
 function PlanetList({ planets }) {
+  if (!planets?.length) return <div className="small">No planets available.</div>;
   return (
     <ul style={{ margin: 0, paddingLeft: 16 }}>
-      {planets.map(p => (
-        <li key={p.name} style={{ marginBottom: 8 }}>
-          <strong>{p.name}</strong>: {p.sign} — {p.degrees}
+      {planets.map((p, i) => (
+        <li key={p.body || p.name || i} style={{ marginBottom: 6 }}>
+          <strong>{p.body || p.name}</strong>: {p.sign || "—"}
+          {p.degree != null ? ` — ${p.degree.toFixed ? p.degree.toFixed(1) : p.degree}°` : ""}
+          {p.house ? `, House ${p.house}` : ""}
         </li>
       ))}
     </ul>
@@ -17,13 +22,15 @@ function PlanetList({ planets }) {
 export default function ChartResult() {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const result = state?.result;
+  const result = state?.result || loadSavedResult(); // ✅ fallback
 
   if (!result) {
     return (
       <Card>
         <h3 style={{ marginTop: 0 }}>No chart available</h3>
-        <p className="small">Please calculate a chart first.</p>
+        <p className="small">
+          Please calculate a chart first on the <Link to="/chart">birth chart</Link> page.
+        </p>
         <div style={{ marginTop: 12 }}>
           <button className="button" onClick={() => navigate("/chart")}>Open birth form</button>
         </div>
@@ -31,12 +38,26 @@ export default function ChartResult() {
     );
   }
 
+  const sun = result.summary?.sun?.sign || result.sun;
+  const moon = result.summary?.moon?.sign || result.moon;
+  const asc  = result.summary?.rising?.sign || result.ascendant;
+
   return (
     <>
       <Card>
-        <h3 style={{ marginTop: 0 }}>{result.name}'s Chart</h3>
-        <div className="small">Sun: {result.sun} • Moon: {result.moon} • Ascendant: {result.ascendant}</div>
+        <h3 style={{ marginTop: 0 }}>{result.name ? `${result.name} — ` : ""}Natal Summary</h3>
+        <div className="small">
+          {sun ? `Sun: ${sun}` : ""} {moon ? `• Moon: ${moon}` : ""} {asc ? `• Rising: ${asc}` : ""}
+        </div>
+        <div className="small" style={{ marginTop: 6 }}>{result.system || result.source}</div>
       </Card>
+
+      <div style={{ marginTop: 12 }}>
+        <Card>
+          {/* ✅ the SVG wheel */}
+          <ChartWheel result={result} size={360} />
+        </Card>
+      </div>
 
       <div style={{ marginTop: 12 }}>
         <Card>
@@ -47,8 +68,12 @@ export default function ChartResult() {
 
       <div style={{ marginTop: 12 }}>
         <Card>
-          <h4 style={{ marginTop: 0 }}>Interpretation</h4>
-          <p className="small">This is a mock interpretation for the MVP. Replace this with dynamic text generated either client-side or from your backend.</p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button className="button" onClick={() => navigate("/chart")}>New chart</button>
+            <button className="button" onClick={() => { clearSavedChart(); navigate("/chart"); }}>
+              Clear saved
+            </button>
+          </div>
         </Card>
       </div>
     </>
