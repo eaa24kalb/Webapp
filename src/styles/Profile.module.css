@@ -162,6 +162,60 @@
   line-height: 1.58;
 }
 
+/* ---------- Favorites List ---------- */
+.favList {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.favItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(199,163,91,0.35);
+  border-radius: 12px;
+  padding: 10px 12px;
+  transition: background 0.15s ease;
+}
+
+.favItem:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.favMeta {
+  display: grid;
+  gap: 2px;
+}
+
+.favTitle {
+  font-weight: 600;
+  font-family: var(--font-display);
+  color: var(--text);
+}
+
+.favSub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.favRemove {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: color 0.15s ease;
+}
+
+.favRemove:hover {
+  color: var(--gold);
+}
+
 /* ---------- Responsive polish ---------- */
 @media (min-width: 540px) {
   .infoGrid { grid-template-columns: 1fr 1fr; }
