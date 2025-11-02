@@ -1,20 +1,31 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-const KEY = "celestia:favorites";
+const KEY = "celestia:favorites:v1";
 const FavoritesContext = createContext();
 
 export function FavoritesProvider({ children }) {
   const [items, setItems] = useState([]);
 
+  // Load once
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) setItems(JSON.parse(raw));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setItems(parsed);
+      }
     } catch (e) {
       console.error("Failed to load favorites", e);
     }
   }, []);
 
+  // Persist on change
   useEffect(() => {
     try {
       localStorage.setItem(KEY, JSON.stringify(items));
@@ -23,30 +34,46 @@ export function FavoritesProvider({ children }) {
     }
   }, [items]);
 
-  function isFavorited(id) {
-    return items.some(i => i.id === id);
-  }
+  const isFavorited = (id) => items.some((i) => i.id === id);
 
-  function add(item) {
-    if (!isFavorited(item.id)) setItems(prev => [...prev, item]);
-  }
+  const add = (item) => {
+    if (!item?.id) return;
+    setItems((prev) => {
+      if (prev.some((i) => i.id === item.id)) return prev;
+      const normalized = {
+        createdAt: new Date().toISOString(),
+        type: "generic",
+        title: "Untitled",
+        meta: {},
+        ...item,
+      };
+      return [normalized, ...prev];
+    });
+  };
 
-  function remove(id) {
-    setItems(prev => prev.filter(i => i.id !== id));
-  }
+  const remove = (id) => setItems((prev) => prev.filter((i) => i.id !== id));
 
-  function toggle(item) {
-    if (isFavorited(item.id)) remove(item.id);
-    else add(item);
-  }
+  const toggle = (item) => (isFavorited(item.id) ? remove(item.id) : add(item));
+
+  const clear = () => setItems([]);
+
+  const byType = (type) => items.filter((i) => i.type === type);
+
+  const value = useMemo(
+    () => ({ items, add, remove, toggle, isFavorited, clear, byType }),
+    [items]
+  );
 
   return (
-    <FavoritesContext.Provider value={{ items, add, remove, toggle, isFavorited }}>
+    <FavoritesContext.Provider value={value}>
       {children}
     </FavoritesContext.Provider>
   );
 }
 
 export function useFavorites() {
-  return useContext(FavoritesContext);
+  const ctx = useContext(FavoritesContext);
+  if (!ctx)
+    throw new Error("useFavorites must be used within FavoritesProvider");
+  return ctx;
 }

@@ -1,24 +1,25 @@
 import React from "react";
 import { useFavorites } from "../contexts/FavoritesContext";
-import "../App.css";
+import styles from "../styles/FavoriteButton.module.css";
 
-export default function FavoriteButton({ item, small }) {
+export default function FavoriteButton({ item, small = false }) {
   const { isFavorited, toggle } = useFavorites();
-  const id = item.id;
+  const active = isFavorited(item.id);
+
   return (
     <button
-      aria-pressed={isFavorited(id)}
+      type="button"
+      aria-pressed={active}
+      aria-label={active ? "Remove from favorites" : "Add to favorites"}
+      className={`${styles.favBtn} ${small ? styles.small : ""} ${
+        active ? styles.active : ""
+      }`}
       onClick={() => toggle(item)}
-      style={{
-        background: "transparent",
-        border: "none",
-        padding: small ? 4 : 8,
-        cursor: "pointer",
-        fontSize: small ? 14 : 16
-      }}
-      title={isFavorited(id) ? "Unfavorite" : "Favorite"}
+      title={active ? "Unfavorite" : "Favorite"}
     >
-      {isFavorited(id) ? "★" : "☆"}
+      <span className={styles.icon} aria-hidden="true">
+        {active ? "★" : "☆"}
+      </span>
     </button>
   );
 }

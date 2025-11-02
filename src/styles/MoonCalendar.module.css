@@ -105,6 +105,26 @@
 /* misc */
 .center { text-align:center; padding:20px; color: var(--muted); }
 
+/* Favorite actions row under phase */
+.actionsRow {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Ritual card header holds title + star neatly */
+.ritualHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ritualTitle {
+  font-weight: 700;
+}
+
 /* responsive */
 @media (max-width: 420px) {
   .moonImg { width: 210px; height: 210px; }
