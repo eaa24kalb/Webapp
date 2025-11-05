@@ -65,15 +65,26 @@
 .phaseTitle { margin: 18px 0 4px; text-align:center; font-size:28px; font-weight:800; }
 .phaseSub { text-align:center; color: var(--muted); }
 
-/* big moon */
-.moonWrap { display:flex; justify-content:center; margin-top: 14px; }
-.moonImg {
-  width: 240px; height: 240px; border-radius: 999px;
-  background:
-    url("/src/assets/moon.png") center/cover no-repeat,
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.05) 28%, rgba(0,0,0,0.65) 60%);
-  box-shadow: inset -16px -12px 32px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.35);
+.moonWrap {
+  display: grid;
+  place-items: center;
+  margin: 10px 0 18px;
 }
+
+.moonImg {
+  width: 280px;          /* whatever size you want */
+  height: 280px;
+  border-radius: 50%;
+  /* your existing glow/shadow/backdrop */
+  box-shadow: 0 18px 40px rgba(0,0,0,.45) inset, 0 14px 30px rgba(0,0,0,.35);
+  background-color: transparent;
+
+  /* >>> make the PNG show */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;   /* or '80% auto' if you want margin inside the circle */
+}
+
 
 /* times row */
 .timesRow { margin-top: 12px; display:flex; justify-content:space-around; align-items:center; }

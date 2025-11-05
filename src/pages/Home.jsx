@@ -53,7 +53,7 @@ export default function Home() {
             <div>
               <div className={styles.doDontTitle}>Do</div>
               <ul className={styles.list}>
-                <li>Sweat stains</li>
+                <li>Clarification</li>
                 <li>Lava lamps</li>
                 <li>Airplane mode</li>
               </ul>
@@ -61,7 +61,7 @@ export default function Home() {
             <div>
               <div className={styles.doDontTitle}>Don’t</div>
               <ul className={styles.list}>
-                <li>Big reveals</li>
+                <li>Tense shoulders</li>
                 <li>Spam</li>
                 <li>Play yourself</li>
               </ul>

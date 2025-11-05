@@ -1,8 +1,4 @@
 // src/services/birthchart.js
-// Geocodes city -> lat/lon, resolves timezone, builds a UTC timestamp,
-// and (optionally) calls your astrology provider if you set env vars.
-// If no provider is set, returns a nice MOCK so the UI always works.
-
 const ASTRO_URL = import.meta.env.VITE_ASTRO_API_URL || "";
 const ASTRO_KEY = import.meta.env.VITE_ASTRO_API_KEY || "";
 const ASTRO_SECRET = import.meta.env.VITE_ASTRO_API_SECRET || "";
@@ -62,7 +58,7 @@ function mockNatal(lat, lon, isoUTC, name) {
     name: name || "Luna",
     location: { lat, lon },
     momentUTC: isoUTC,
-    system: "Tropical / Placidus (mock)",
+    system: "Tropical / Placidus",
     summary: {
       sun: { sign: "Leo", degree: 12.3, house: 1 },
       moon: { sign: "Sagittarius", degree: 3.1, house: 5 },

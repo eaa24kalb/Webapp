@@ -1,6 +1,4 @@
 // src/services/api.js
-// Simple & reliable Moon Calendar API (no external fetch, no zodiac dependency)
-
 import SunCalc from "suncalc";
 
 function weekdayName(dateStr) {

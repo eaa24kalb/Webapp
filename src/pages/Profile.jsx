@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import Card from "../components/Card";
 import ChartWheel from "../features/birthchart/ChartWheel";
 import { loadSavedResult } from "../features/birthchart/useLocalChart";
-import { useFavorites } from "../contexts/FavoritesContext"; // ✅ new
+import { useFavorites } from "../contexts/FavoritesContext";
 import styles from "../styles/Profile.module.css";
 import Avatar1 from "../assets/images/Avatar1.png";
 
 export default function Profile() {
-  const [tab, setTab] = useState("chart"); // "chart" | "saved" | "settings"
-  const { items, toggle } = useFavorites(); // ✅ load favorites
+  const [tab, setTab] = useState("chart");
+  const { items, toggle } = useFavorites(); 
 
   const result = useMemo(() => loadSavedResult(), []);
   const sun = result?.summary?.sun?.sign;
