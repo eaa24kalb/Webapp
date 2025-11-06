@@ -1,3 +1,5 @@
+// Simple form to collect birth data and calculate a birthchart
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { calculateBirthChart } from "../../services/birthchart";
@@ -5,10 +7,11 @@ import { loadSavedForm, saveForm, saveResult } from "./useLocalChart";
 
 export default function BirthForm() {
   const nav = useNavigate();
-  const [form, setForm] = useState({ name: "Luna", date: "", time: "", city: "Copenhagen" });
+  const [form, setForm] = useState({ name: "Luna", date: "", time: "", city: "London" });
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
+    // Autosave restore
   useEffect(() => {
     const saved = loadSavedForm();
     if (saved) setForm(prev => ({ ...prev, ...saved }));
@@ -23,19 +26,23 @@ export default function BirthForm() {
   async function onSubmit(e) {
     e.preventDefault();
     setErr("");
+
+    // require date, time, city
     if (!form.date || !form.time || !form.city) {
       setErr("Please fill date, time and city.");
       return;
     }
     try {
       setLoading(true);
+
+      // Calculate chart
       const result = await calculateBirthChart(form);
       saveForm(form);
       saveResult(result);
       nav("/chart/result", { state: { result } });
     } catch (ex) {
       console.error(ex);
-      setErr("We couldn’t calculate your chart. Please try again.");
+      setErr("We couldn't calculate your chart. Please try again.");
     } finally {
       setLoading(false);
     }

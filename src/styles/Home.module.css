@@ -139,13 +139,13 @@
 }
 
 .avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.2) 40%, rgba(0,0,0,0.25) 65%),
-    linear-gradient(135deg, rgba(246,211,101,0.25), rgba(153,84,187,0.25));
-  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  width: 55px;
+  height: 55px;
+  border-radius: 9999px;
+  display: block;           
+  overflow: hidden;          
+  object-fit: cover;        
+  object-position: center;   
   flex-shrink: 0;
 }
 

@@ -1,17 +1,27 @@
-// src/pages/Home.jsx
+// Home main page 
+
 import React from "react";
 import { Link } from "react-router-dom";
 import Card from "../components/Card";
 import MoonCard from "../features/moon/MoonCard";
 import styles from "../styles/Home.module.css";
 
+// Avatar images
+import Avatar2 from "../assets/images/Avatar2.png";
+import Avatar3 from "../assets/images/Avatar3.png";
+import Avatar4 from "../assets/images/Avatar4.png";
+
+
 export default function Home() {
+
+  // Community
   const community = [
     {
       id: "1",
       name: "Alissa",
       handle: "@alissaeagan222",
       sign: "♊ Gemini",
+      avatar: Avatar2, 
       snippet:
         "You and Alissa are a passionate & generative match. You share a straight-forward attitude and a drive to do what feels right in the moment.",
     },
@@ -20,6 +30,7 @@ export default function Home() {
       name: "Magnus",
       handle: "@mmalthanl",
       sign: "♍ Virgo",
+      avatar: Avatar3,
       snippet:
         "Magnus is leaving a period of isolation. Magnus’ day at a glance: Your love is one for the books.",
     },
@@ -28,6 +39,7 @@ export default function Home() {
       name: "Maria",
       handle: "@mariania766",
       sign: "♌ Scorpio",
+      avatar: Avatar4,
       snippet:
         "Maria won the award for most costume changes in one minute. You also won the award for most costume changes in one minute.",
     },
@@ -96,7 +108,11 @@ export default function Home() {
           {community.map(item => (
             <Card key={item.id} className={styles.feedCard}>
               <div className={styles.feedHeader}>
-                <div className={styles.avatar} aria-hidden />
+                 <img
+                  src={item.avatar}
+                  alt={`${item.name} avatar`}
+                  className={styles.avatar}
+                />
                 <div className={styles.identity}>
                   <div className={styles.nameRow}>
                     <span className={styles.name}>{item.name}</span>

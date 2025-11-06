@@ -1,3 +1,5 @@
+// Draws the natal (birth) chart wheel using SVG and a lot of math
+
 import React from "react";
 import styles from "../../styles/ChartWheel.module.css";
 
@@ -25,6 +27,7 @@ function thetaFromLon(lon) {
   const deg = 90 - lon; // 0° at right
   return (deg * Math.PI) / 180;
 }
+
 
 export default function ChartWheel({ result, size = 360 }) {
   const cx = size / 2;
@@ -61,6 +64,7 @@ export default function ChartWheel({ result, size = 360 }) {
     };
   });
 
+    //  SVG RENDER 
   return (
     <div className={styles.wrap} style={{ width: size, height: size }}>
       <svg viewBox={`0 0 ${size} ${size}`} className={styles.svg} aria-label="Natal chart wheel">

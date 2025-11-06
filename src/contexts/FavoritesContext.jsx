@@ -1,3 +1,5 @@
+// Manages favorites across the app, saved in localStorage
+
 import React, {
   createContext,
   useContext,
@@ -12,7 +14,7 @@ const FavoritesContext = createContext();
 export function FavoritesProvider({ children }) {
   const [items, setItems] = useState([]);
 
-  // Load once
+  // Loads favorites from localStorage when the app starts
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
@@ -25,7 +27,7 @@ export function FavoritesProvider({ children }) {
     }
   }, []);
 
-  // Persist on change
+  // Saves favorites to localStorage whenever they change
   useEffect(() => {
     try {
       localStorage.setItem(KEY, JSON.stringify(items));
@@ -34,11 +36,16 @@ export function FavoritesProvider({ children }) {
     }
   }, [items]);
 
+  // Checks if a specific item is already a favorite
   const isFavorited = (id) => items.some((i) => i.id === id);
 
+
+  // Adds a new favorite item
   const add = (item) => {
     if (!item?.id) return;
     setItems((prev) => {
+
+      //Don’t add duplicates
       if (prev.some((i) => i.id === item.id)) return prev;
       const normalized = {
         createdAt: new Date().toISOString(),
@@ -47,16 +54,22 @@ export function FavoritesProvider({ children }) {
         meta: {},
         ...item,
       };
+
+    // Adds the new item to the start of the list
       return [normalized, ...prev];
     });
   };
 
+  // Removes by id
   const remove = (id) => setItems((prev) => prev.filter((i) => i.id !== id));
 
+  // Toggle 
   const toggle = (item) => (isFavorited(item.id) ? remove(item.id) : add(item));
 
+  // Clears all favorites
   const clear = () => setItems([]);
 
+  // Get only favorites of a specific type
   const byType = (type) => items.filter((i) => i.type === type);
 
   const value = useMemo(
@@ -71,6 +84,7 @@ export function FavoritesProvider({ children }) {
   );
 }
 
+// Hook for components to access favorites
 export function useFavorites() {
   const ctx = useContext(FavoritesContext);
   if (!ctx)

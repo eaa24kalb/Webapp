@@ -1,9 +1,13 @@
+// Shows the result of calculated birth chart
+// Either it calculates atm or loads last saved form localStorage
+
 import React from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import Card from "../components/Card";
 import ChartWheel from "../features/birthchart/ChartWheel";
 import { loadSavedResult, clearSavedChart } from "../features/birthchart/useLocalChart";
 
+//  Render the planets
 function PlanetList({ planets }) {
   if (!planets?.length) return <div className="small">No planets available.</div>;
   return (
@@ -22,8 +26,9 @@ function PlanetList({ planets }) {
 export default function ChartResult() {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const result = state?.result || loadSavedResult(); // ✅ fallback
+  const result = state?.result || loadSavedResult(); 
 
+   // No chart --> "create one"
   if (!result) {
     return (
       <Card>
@@ -38,6 +43,7 @@ export default function ChartResult() {
     );
   }
 
+  //  Highlights
   const sun = result.summary?.sun?.sign || result.sun;
   const moon = result.summary?.moon?.sign || result.moon;
   const asc  = result.summary?.rising?.sign || result.ascendant;
@@ -45,7 +51,7 @@ export default function ChartResult() {
   return (
     <>
       <Card>
-        <h3 style={{ marginTop: 0 }}>{result.name ? `${result.name} — ` : ""}Natal Summary</h3>
+        <h3 style={{ marginTop: 0 }}>{result.name ? `${result.name} — ` : ""}Summary</h3>
         <div className="small">
           {sun ? `Sun: ${sun}` : ""} {moon ? `• Moon: ${moon}` : ""} {asc ? `• Rising: ${asc}` : ""}
         </div>
@@ -54,7 +60,7 @@ export default function ChartResult() {
 
       <div style={{ marginTop: 12 }}>
         <Card>
-          {/* ✅ the SVG wheel */}
+          
           <ChartWheel result={result} size={360} />
         </Card>
       </div>
@@ -66,6 +72,7 @@ export default function ChartResult() {
         </Card>
       </div>
 
+      {/* make a new chart / clear */}
       <div style={{ marginTop: 12 }}>
         <Card>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>

@@ -1,3 +1,5 @@
+// Shows moon calendar of phases for the current month
+
 import React, { useEffect, useRef, useState } from "react";
 import { fetchMoonCalendar } from "../services/api";
 import styles from "../styles/MoonCalendar.module.css";
@@ -11,6 +13,7 @@ import imgCrescent from "../assets/images/mooncrescent.png";
 import imgDefault from "../assets/images/moonimg.png";
 
 
+// Moon img based on the phase
 function getMoonImage(phaseId = "") {
   const k = String(phaseId).toLowerCase().replace(/\s+/g, "_");
 
@@ -19,11 +22,11 @@ function getMoonImage(phaseId = "") {
   if (k.includes("first_quarter") || k === "quarter" || k.includes("quarter"))
     return imgQuarter;
   if (k.includes("full")) return imgFull;
-  if (k.includes("gibbous")) return imgDefault; // waxing/waning gibbous
-  // any unknown/other -> default nice photo
+  if (k.includes("gibbous")) return imgDefault; 
   return imgDefault;
 }
 
+// Group daily data into weeks (7-day rows)
 function chunkDaysToWeeks(days = [], weekStart = 1) {
   if (!days?.length) return [];
   const first = new Date(days[0].date);
@@ -44,6 +47,7 @@ function chunkDaysToWeeks(days = [], weekStart = 1) {
   return weeks;
 }
 
+//  Week swipe
 function useSwipe(onLeft = () => {}, onRight = () => {}) {
   const startX = useRef(null), dragging = useRef(false);
   const start = x => { startX.current = x; dragging.current = true; };
@@ -63,6 +67,7 @@ function useSwipe(onLeft = () => {}, onRight = () => {}) {
   };
 }
 
+// Main Component
 export default function MoonCalendar() {
   const [data, setData] = useState(null);
   const [weeks, setWeeks] = useState([]);
@@ -70,6 +75,7 @@ export default function MoonCalendar() {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
 
+    // Fetches moon data from API
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -81,14 +87,17 @@ export default function MoonCalendar() {
         const w = chunkDaysToWeeks(res.days || [], 1);
         setWeeks(w);
 
-        const todayIso = new Date().toISOString().slice(0, 10);
+        // current week
+       const todayIso = new Date().toISOString().slice(0, 10);
         let idx = w.findIndex(week => week.some(d => d && d.date === todayIso));
         if (idx === -1) idx = 0;
         setWeekIndex(idx);
 
-        const wk = w[idx] || [];
-        const firstReal = wk.find(d => d && !d.placeholder) || wk[0] || null;
-        setSelected(firstReal);
+        // always select today's date 
+        const todayData = res.days?.find(d => d.date === todayIso);
+        setSelected(todayData || (res.days?.[0] ?? null));
+
+        
       } finally { mounted && setLoading(false); }
     })();
     return () => { mounted = false; };
@@ -107,16 +116,19 @@ export default function MoonCalendar() {
     return arr;
   })();
 
+    //  Page Layout
   return (
     <div className={styles.page}>
       <section className={styles.hero}>
+
+      {/* Header row */}
         <div className={styles.topRow}>
           <button className={styles.backBtn} onClick={() => history.back()} aria-label="Back">←</button>
           <div className={styles.topTitle}>Moon Calendar</div>
           <div className={styles.monthBadge}>{data ? `${data.month}/${data.year}` : ""}</div>
         </div>
 
-        {/* 7 fixed chips */}
+      {/* week */}
         <div
           className={styles.weekRow7}
           onTouchStart={swipe.onTouchStart}
@@ -147,7 +159,7 @@ export default function MoonCalendar() {
           })}
         </div>
 
-        {/* arrows UNDER the chips */}
+        {/* arrows under chips */}
         <div className={styles.weekArrowsUnder}>
           <button className={styles.arrowBtn} onClick={gotoPrev} aria-label="Previous week">←</button>
           <button className={styles.arrowBtn} onClick={gotoNext} aria-label="Next week">→</button>
@@ -159,7 +171,7 @@ export default function MoonCalendar() {
           {selected?.illumination != null ? `${selected.illumination}% illuminated` : "—"}
         </div>
 
-        {/* Favorite the selected day */}
+        {/* favorite */}
         {selected && (
           <div className={styles.actionsRow}>
             <FavoriteButton
@@ -178,7 +190,7 @@ export default function MoonCalendar() {
           </div>
         )}
 
-        {/* Moon image (uses your assets mapping) */}
+        {/* moon img) */}
         <div className={styles.moonWrap}>
           {selected && (
             <div
@@ -190,7 +202,7 @@ export default function MoonCalendar() {
           )}
         </div>
 
-        {/* times */}
+        {/* times set/rise */}
         <div className={styles.timesRow}>
           <div className={styles.timeCol}><span className={styles.timeIcon}>🌙⬆️</span><div className={styles.timeText}>{time(selected?.rise)}</div></div>
           <div className={styles.timeCol}><span className={styles.timeIcon}>🌙⬇️</span><div className={styles.timeText}>{time(selected?.set)}</div></div>
@@ -209,22 +221,22 @@ export default function MoonCalendar() {
           <div className={styles.infoRow}><span>Azimuth:</span><strong>{selected?.azimuth != null ? `${selected.azimuth}°` : "—"}</strong></div>
         </div>
 
-        {/* rituals – unchanged */}
+        {/* ritual for phase */}
         <div className={styles.ritualsWrap}>
           <div className={styles.ritualsTitle}>Rituals</div>
           <div className={styles.ritualGrid}>
             {(() => {
               const key = (selected?.phaseId || "unknown").toLowerCase().replace(/\s+/g, "_");
               const map = {
-                new_moon: ["New Moon — Set intentions", "Moon water — charge jar overnight"],
-                waxing_crescent: ["Plant seeds — small steps", "Carry citrine"],
+                new_moon: ["New Moon — Set intentions", "Moon water - charge jar overnight"],
+                waxing_crescent: ["Plant seeds - small steps", "Carry citrine"],
                 first_quarter: ["Take decisive action", "Short movement ritual"],
                 waxing_gibbous: ["Polish projects"],
                 full: ["Full moon release", "Full moon bath (moon water)"],
                 waning_gibbous: ["Share & reflect"],
                 last_quarter: ["Let go & declutter"],
                 waning_crescent: ["Rest & prepare"],
-                unknown: ["Quiet night — journal"]
+                unknown: ["Quiet night - journal"]
               };
               return (map[key] || map.unknown).map((t, i) => (
                 <div key={i} className={styles.ritualCard}>

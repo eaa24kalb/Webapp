@@ -1,3 +1,5 @@
+// For users personal info like birthchart, horoscope and saved favs
+
 import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Card from "../components/Card";

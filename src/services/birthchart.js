@@ -1,12 +1,14 @@
-// src/services/birthchart.js
+// Turns user input (city, date, time) into coordinates + UTC, then calls astrology stuff (or mock if API fails) and turns into chart
+
 const ASTRO_URL = import.meta.env.VITE_ASTRO_API_URL || "";
 const ASTRO_KEY = import.meta.env.VITE_ASTRO_API_KEY || "";
 const ASTRO_SECRET = import.meta.env.VITE_ASTRO_API_SECRET || "";
 
-// ---------- helpers ----------
+// Converts various formats into ISO ("-")
+// Accepts formats like "31.08.1994" or "31 08 1994"
 function toISODate(d) {
   if (!d) return "";
-  if (d.includes("-")) return d; // already ISO
+  if (d.includes("-")) return d; 
   const [dd, mm, yyyy] = d.split(/[./\s]/).map(s => s.trim());
   if (yyyy && mm && dd) {
     const pad = n => String(n).padStart(2, "0");
@@ -15,11 +17,13 @@ function toISODate(d) {
   return d;
 }
 
+// Converts formats (. --> :)
 function normalizeTimeStr(t) {
   if (!t) return "12:00";
   return t.replace(".", ":");
 }
 
+// Uses the Open-Meteo Geocoding API to convert  city name into lat/lon coor.
 async function geocodeCity(city) {
   const url = `https://geocoding-api.open-meteo.com/v1/search?count=1&name=${encodeURIComponent(city)}`;
   const r = await fetch(url);
@@ -34,6 +38,7 @@ async function geocodeCity(city) {
   };
 }
 
+// Uses Open-Meteo Timezone API to resolve timezone info specific date/time
 async function resolveTimezone(lat, lon, isoDateTime) {
   const url = `https://api.open-meteo.com/v1/timezone?latitude=${lat}&longitude=${lon}&date_time=${encodeURIComponent(isoDateTime)}`;
   const r = await fetch(url);
@@ -44,6 +49,7 @@ async function resolveTimezone(lat, lon, isoDateTime) {
   };
 }
 
+// Converts local date/time to UTC ISO string
 function toUTCISO(isoDate, hhmm, utcOffsetSeconds) {
   const [h, m] = hhmm.split(":").map(Number);
   const local = new Date(`${isoDate}T${String(h).padStart(2, "0")}:${String(m ?? 0).padStart(2, "0")}:00`);
@@ -51,7 +57,7 @@ function toUTCISO(isoDate, hhmm, utcOffsetSeconds) {
   return new Date(utcMs).toISOString();
 }
 
-// ---------- mock ----------
+// The mock fallback if no API URL is configured, or the API call fails
 function mockNatal(lat, lon, isoUTC, name) {
   return {
     source: "mock",
@@ -78,7 +84,7 @@ function mockNatal(lat, lon, isoUTC, name) {
   };
 }
 
-// ---------- main ----------
+// The main: given user info, calculate the birth chart.
 export async function calculateBirthChart({ name, date, time, city }) {
   const isoDate = toISODate(date);
   const hhmm = normalizeTimeStr(time);

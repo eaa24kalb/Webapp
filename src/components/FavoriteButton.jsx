@@ -1,3 +1,5 @@
+// reusable button to favorite or unfavorite stuff
+
 import React from "react";
 import { useFavorites } from "../contexts/FavoritesContext";
 import styles from "../styles/FavoriteButton.module.css";

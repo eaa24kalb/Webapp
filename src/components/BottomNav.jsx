@@ -1,3 +1,5 @@
+// Bottom nav bar shown across the app
+
 import React from "react";
 import { NavLink } from "react-router-dom";
 import "../App.css";

@@ -23,7 +23,6 @@ export default function MoonCard({ date = new Date(), lat = 55.68, lon = 12.57 }
   return (
     <Link to="/moon" style={{ textDecoration: "none", color: "inherit" }}>
       <section className="card" aria-labelledby="moon-title" style={{ marginBottom: 16 }}>
-        {/* existing content unchanged */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <h3 id="moon-title" style={{ margin: 0 }}>Current Moon Phase</h3>
@@ -31,7 +30,7 @@ export default function MoonCard({ date = new Date(), lat = 55.68, lon = 12.57 }
           </div>
 
           <div aria-hidden>
-            {/* simple SVG */}
+            {/*  SVG */}
             <svg width="68" height="68" viewBox="0 0 72 72" role="img" aria-hidden="true">
               <circle cx="36" cy="36" r="28" fill="#FFFBF0" opacity="0.9" />
               <circle cx={36 + (illum.angle || 0) * 2} cy="36" r="28" fill="#2b2130" opacity="0.45" />

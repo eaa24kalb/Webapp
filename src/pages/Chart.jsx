@@ -1,3 +1,5 @@
+// Displays birthchart page.
+
 import React from "react";
 import Card from "../components/Card";
 import BirthForm from "../features/birthchart/BirthForm";

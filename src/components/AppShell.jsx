@@ -1,4 +1,5 @@
-// src/components/AppShell.jsx
+// Layout wrapper with global header + bottom nav.
+
 import React from "react";
 import { useLocation } from "react-router-dom";
 import BottomNav from "./BottomNav";
@@ -26,11 +27,10 @@ export default function AppShell({ children }) {
   const longDate = formatLongDate(now);
   const location = useLocation();
 
-  // ✅ Only show header on the Home route
+  // Show header only on home
   const isHome = location.pathname === "/";
   const showHeader = isHome;
 
-  // ✅ Make every non-home page full-bleed
   const isFullBleed = !isHome;
 
   return (
